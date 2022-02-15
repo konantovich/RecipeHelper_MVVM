@@ -184,6 +184,8 @@ class DetailViewController: UIViewController {
         layout.scrollDirection = .horizontal
         // set the frame and layout
         
+        
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
         self.collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -193,7 +195,7 @@ class DetailViewController: UIViewController {
         // set the delegate
         self.collectionView.delegate = self
         // bounce at the bottom of the collection view
-        self.collectionView.alwaysBounceVertical = true
+       // self.collectionView.alwaysBounceVertical = true
         // set the background to be white
         self.collectionView.backgroundColor = .none
         
@@ -251,7 +253,7 @@ class DetailViewController: UIViewController {
     // MARK: - UICollectionViewDelegate, UICollectionViewDataSource
 extension DetailViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let tryAlso = detailViewModel.tryAlso?.count else {return 0}
+        guard let tryAlso = detailViewModel.tryAlso?.prefix(3).count else {return 0}
         return tryAlso
     }
     
@@ -260,7 +262,7 @@ extension DetailViewController: UICollectionViewDelegate, UICollectionViewDataSo
         // dequeue the standard cell
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? CollectionViewCell {
             //    let data = self.collectionViewData[indexPath.item]
-            guard let tryAlso = detailViewModel.tryAlso?[indexPath.row] else {
+            guard let tryAlso = detailViewModel.tryAlso?.prefix(3)[indexPath.row] else {
                 
                 fatalError("Unable to dequeue subclassed cell")
             }

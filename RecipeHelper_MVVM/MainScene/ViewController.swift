@@ -68,8 +68,6 @@ class ViewController: UIViewController {
         dissmisTableViewGesture ()
         setupSearchBar()
         
-       
-       
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -78,11 +76,10 @@ class ViewController: UIViewController {
         
         viewModel.requestSearchFilterData(searchText: "Apple") {
             self.tableView.reloadData()
-            self.loadingLabel.text = ""
+//            self.loadingLabel.text = ""
+            self.loadingLabel.isHidden = true
         }
-
-        
-        
+  
     }
     
     // MARK: - SetupSearchBar
@@ -99,7 +96,7 @@ class ViewController: UIViewController {
     // MARK: - SetupTableView
     func setupTableView () {
        // viewModel.setupTableView()
-        
+        tableView.isScrollEnabled = false
         tableView.backgroundColor = .none
         
         tableView.register(MyCustomCell.self, forCellReuseIdentifier: "cell")
@@ -110,8 +107,6 @@ class ViewController: UIViewController {
         
         viewForTableView.backgroundColor = .brown
         //closeTableView.backgroundColor = .red
-        
-        
         
         view.addSubview(viewForTableView)
         viewForTableView.addSubview(tableView)
@@ -126,8 +121,6 @@ class ViewController: UIViewController {
         closeTableViewTopAnchorConstraint = closeTableView.topAnchor.constraint(equalTo: viewForTableView.topAnchor)
         closeTableViewTopAnchorConstraint.constant = 140
         closeTableViewTopAnchorConstraint.isActive = true
-        
-        
         
         NSLayoutConstraint.activate([
             // viewForTableView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -145,8 +138,6 @@ class ViewController: UIViewController {
             closeTableView.heightAnchor.constraint(equalToConstant: 15),
             closeTableView.widthAnchor.constraint(equalToConstant: view.frame.width),
         ])
-        
-      
     }
 }
 
@@ -177,8 +168,9 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         detailViewController.detailViewModel = viewModel.didSelectRowAt(indexPath: indexPath, isFiltering: isFiltering)
         
-        
-        
+        viewModel.recipeModel.bind { recipes in
+            print("recipeModel.bind:", recipes[indexPath.row].label)
+        }
         
        present(detailViewController, animated: true, completion: nil)
       
@@ -238,22 +230,18 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
     }
 }
+
 //MARK: - UISearchResultsUpdating
 extension ViewController: UISearchResultsUpdating {
 
     func updateSearchResults(for searchController: UISearchController) {
         print(searchController.searchBar.text ?? "")
-        print(viewModel.recipeModel.value.first?.label)
-
-        
+ 
         viewModel.updateSearchResults(searchController: searchController, isApiModeEnable: isApiModeEnable) {
-      
                 self.tableView.reloadData()
-            
         }
     }
 }
-
 
 //MARK: - GestureRecognizer (open/close tableView)
 extension ViewController {
@@ -330,7 +318,6 @@ extension ViewController {
         print(-translation.y, speed.y )  //-translation.y / 200
     }
     
-    
     func maximizeTableView() {
         print("maximizeTrackDetailsController")
         maximizedTopAnchorForConstraint.isActive = true
@@ -371,14 +358,5 @@ extension ViewController {
         },
                        completion: nil)
     }
-    
-    
-    
-    
+
 }
-
-
-
-
-   
-
