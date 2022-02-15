@@ -14,6 +14,7 @@ class DetailViewController: UIViewController {
 
     var detailViewModel : DetailViewModel!
     
+    private var timer: Timer?
     
     private var collectionView: UICollectionView!
 
@@ -78,6 +79,8 @@ class DetailViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    var imagesFromUrl : [String]?
 
     //MARK: - ViewDidLoad
     override func viewDidLoad() {
@@ -85,7 +88,17 @@ class DetailViewController: UIViewController {
         
         guard let detailViewModel = detailViewModel else {return}
         
+       
         
+        detailViewModel.tryAlsoForSelectedRecipe {
+            
+            self.timer?.invalidate()
+            self.timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { _ in
+                self.collectionView.reloadData()
+               
+            })
+          
+        }
         
         print(detailViewModel.selectedRecipe.label)
         
@@ -132,8 +145,9 @@ class DetailViewController: UIViewController {
         // stackView.frame = CGRect(x: 0, y: 0, width: 400, height: 400)
         scrollView.addSubview(stackView)
         
+       
         let imagesFromUrl = [detailViewModel.selectedRecipe?.images?.large?.url ?? "", detailViewModel.selectedRecipe?.images?.regular?.url ?? "", detailViewModel.selectedRecipe?.images?.small?.url ?? ""]
-        
+       
         for i in 0..<imagesFromUrl.count {
             let imagesForSwipe = detailViewModel.getImageFromUrl(urlString: imagesFromUrl)
             let imageView = imagesForSwipe[i]
@@ -282,8 +296,14 @@ extension DetailViewController: UICollectionViewDelegate, UICollectionViewDataSo
         guard let tryAlso = detailViewModel.tryAlso?[indexPath.row] else {
             fatalError("Unable to dequeue subclassed cell")
         }
+        detailViewModel.selectedRecipe = tryAlso
+        detailViewModel.tryAlsoForSelectedRecipe {
+            self.collectionView.reloadData()
+            self.setupDataSource()
+            self.setupScrollView()
+        }
         
-        guard let url = URL(string: tryAlso.url ?? "") else { return }
-        UIApplication.shared.open(url)
+//        guard let url = URL(string: tryAlso.url ?? "") else { return }
+//        UIApplication.shared.open(url)
     }
 }

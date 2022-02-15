@@ -45,7 +45,7 @@ class CollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    var recipesCount: UILabel = {
+    lazy var recipesCount: UILabel = {
         let label = UILabel()
         label.text = " 0 "
         label.textAlignment = .center

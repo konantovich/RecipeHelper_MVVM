@@ -15,10 +15,12 @@ class DetailViewModel {
     
     var tryAlso: [Recipe]?
     
+    let networkService = NetworkService()
+    
     
     init (selectedRecipe: Recipe, tryAlso: [Recipe]) {
         self.selectedRecipe = selectedRecipe
-        self.tryAlso = tryAlso
+        //self.tryAlso = tryAlso
     }
 
     func getImageFromUrl (urlString: [String]) -> [UIImageView] {
@@ -35,6 +37,29 @@ class DetailViewModel {
     init () {
         
     }
+    
+    
+    func tryAlsoForSelectedRecipe (completion: @escaping () -> () ) -> Void  {
+        
+        networkService.fetchEdamamRecipes(search: String(selectedRecipe.label?.prefix(5) ?? "")) { recipe in
+           
+            guard let recipe = recipe,
+                  let hits = recipe.hits?.prefix(10).compactMap({ $0.recipe }),
+                  hits.count > 0 else  {
+                      print("nil search")
+                      return
+                  }
+            
+            var tryAlsoArray = hits.filter { $0 != self.selectedRecipe }
+            
+            tryAlsoArray.shuffle()
+            self.tryAlso = tryAlsoArray
+            completion()
+           
+        }
+        
+    }
+
     
     
 }
