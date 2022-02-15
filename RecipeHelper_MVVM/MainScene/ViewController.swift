@@ -20,7 +20,11 @@ class ViewController: UIViewController {
     
     private var minimizedTopAnchorForConstraint: NSLayoutConstraint!
     private var maximizedTopAnchorForConstraint: NSLayoutConstraint!
+    private var minimizedBottomAnchorForConstraint: NSLayoutConstraint!
+    
     private var closeTableViewTopAnchorConstraint: NSLayoutConstraint!
+    
+    private var isMaximizedOn: Bool = true
     
     let searchController = UISearchController(searchResultsController: nil)
     
@@ -115,6 +119,9 @@ class ViewController: UIViewController {
         
         maximizedTopAnchorForConstraint = viewForTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0)
         minimizedTopAnchorForConstraint = viewForTableView.topAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
+        minimizedBottomAnchorForConstraint = viewForTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+        
+        minimizedBottomAnchorForConstraint.isActive = true
         maximizedTopAnchorForConstraint.isActive = true
         minimizedTopAnchorForConstraint.isActive = false
         
@@ -126,7 +133,7 @@ class ViewController: UIViewController {
             // viewForTableView.topAnchor.constraint(equalTo: view.topAnchor),
             viewForTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             viewForTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            viewForTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+//            viewForTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
         tableView.topAnchor.constraint(equalTo: closeTableView.topAnchor, constant: 0).isActive = true
@@ -296,9 +303,18 @@ extension ViewController {
         //логика что бы наш контроллер двигался за движением пальца (по Y)
         viewForTableView.transform = CGAffineTransform(translationX: 0, y: translation.y)
         //уменьшаем альфу в зависимости от положения нашего viewForTableView
-        let newAlpha = 2 + -translation.y / 200
-        self.tableView.alpha = newAlpha
-        print(newAlpha)
+        
+        if isMaximizedOn {
+            let newAlpha = 2 + -translation.y / 200
+            self.tableView.alpha = newAlpha
+        } else {
+            let newAlpha = -1 + -translation.y / 200
+            self.tableView.alpha = newAlpha
+            print(newAlpha)
+        }
+      
+        
+       
         print(self.tableView.alpha)
     }
     
@@ -326,6 +342,8 @@ extension ViewController {
         closeTableViewTopAnchorConstraint.constant = 140
         maximizedTopAnchorForConstraint.constant = 0
         
+        isMaximizedOn = true
+        
         UIView.animate(withDuration: 0.5,
                        delay: 0,
                        usingSpringWithDamping: 0.7,
@@ -334,7 +352,7 @@ extension ViewController {
                        animations: {
             self.view.layoutIfNeeded()//обновляет каждую милисекунду(иначе мы не увидим)
             self.viewForTableView.transform = .identity //изначальное состояние (иначе все будет съезжать)
-            self.tableView.alpha = 1
+          //  self.tableView.alpha = 1
         },
                        completion: nil)
     }
@@ -344,6 +362,12 @@ extension ViewController {
         maximizedTopAnchorForConstraint.isActive = false
         minimizedTopAnchorForConstraint.isActive = true
         closeTableViewTopAnchorConstraint.constant = 0
+        
+        minimizedBottomAnchorForConstraint.constant = view.frame.height
+       // minimizedBottomAnchorForConstraint.isActive = false
+        
+        isMaximizedOn = false
+        
         // minimizedTopAnchorForConstraint.constant = 0
         
         UIView.animate(withDuration: 0.5,
@@ -354,7 +378,7 @@ extension ViewController {
                        animations: {
             self.view.layoutIfNeeded()//обновляет каждую милисекунду(иначе мы не увидим)
             self.viewForTableView.transform = .identity //изначальное состояние (иначе все будет съезжать)
-            self.tableView.alpha = 0
+            //self.tableView.alpha = 0
         },
                        completion: nil)
     }
